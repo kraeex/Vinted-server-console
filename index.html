@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speak Your Mind</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1108;
+      --cream: #f5f0e8;
+      --tan: #e8dfc8;
+      --accent: #c2440e;
+      --muted: #8a7d6a;
+      --field-bg: #ede6d6;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.6;
+    }
+
+    .page {
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 620px;
+      animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      animation: rise 0.8s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 6vw, 3.8rem);
+      line-height: 1.08;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+      animation: rise 0.8s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 300;
+      margin-bottom: 2.4rem;
+      animation: rise 0.8s 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Filled text field */
+    .field-wrap {
+      position: relative;
+      animation: rise 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .field-wrap label {
+      position: absolute;
+      top: 50%;
+      left: 1.1rem;
+      transform: translateY(-50%);
+      font-size: 0.9rem;
+      color: var(--muted);
+      pointer-events: none;
+      transition: all 0.22s ease;
+      transform-origin: left center;
+    }
+
+    .field-wrap input {
+      width: 100%;
+      background: var(--field-bg);
+      border: none;
+      border-bottom: 2px solid var(--muted);
+      border-radius: 8px 8px 0 0;
+      padding: 1.4rem 1.1rem 0.5rem;
+      font-size: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .field-wrap input:focus {
+      background: var(--tan);
+      border-bottom-color: var(--accent);
+    }
+
+    .field-wrap input:focus + label,
+    .field-wrap input:not(:placeholder-shown) + label {
+      top: 0.55rem;
+      transform: translateY(0) scale(0.78);
+      color: var(--accent);
+    }
+
+    .field-wrap input::placeholder { color: transparent; }
+
+    /* Underline bar */
+    .field-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width 0.3s ease, left 0.3s ease;
+    }
+
+    .field-wrap:focus-within::after {
+      width: 100%; left: 0;
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.4rem;
+      animation: rise 0.8s 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border: none;
+      border-radius: 6px;
+      padding: 0.75rem 1.6rem;
+      transition: transform 0.15s, opacity 0.15s, box-shadow 0.15s;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(194, 68, 14, 0.28);
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--tan);
+    }
+
+    .btn-ghost:hover { background: var(--tan); color: var(--ink); }
+
+    /* Output */
+    .output {
+      margin-top: 1.8rem;
+      padding: 1.1rem 1.2rem;
+      background: var(--field-bg);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--ink);
+      min-height: 3rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      display: none;
+      animation: rise 0.5s ease both;
+    }
+
+    .output.visible { display: block; }
+
+    .char-count {
+      text-align: right;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <p class="eyebrow">Open Studio</p>
+      <h1>Vinted server <em>console.</em></h1>
+      <p class="subtitle">Type anything. Your words live here.</p>
+
+      <div class="field-wrap">
+        <input
+          type="text"
+          id="mainInput"
+          placeholder=" "
+          maxlength="160"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <label for="mainInput">Enter code here</label>
+      </div>
+      <p class="char-count"><span id="count">0</span> / 160</p>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="submit()">Submit</button>
+        <button class="btn-ghost" onclick="clear()">Clear</button>
+      </div>
+
+      <div class="output" id="output"></div>
+    </div>
+  </div>
+
+  <script>
+    const input = document.getElementById('mainInput');
+    const output = document.getElementById('output');
+    const count = document.getElementById('count');
+
+    input.addEventListener('input', () => {
+      count.textContent = input.value.length;
+    });
+
+    function submit() {
+      const val = input.value.trim();
+      if (!val) return;
+      output.textContent = `"${val}"`;
+      output.classList.add('visible');
+    }
+
+    function clear() {
+      input.value = '';
+      count.textContent = '0';
+      output.classList.remove('visible');
+      output.textContent = '';
+      input.focus();
+    }
+
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submit();
+    });
+  </script>
+</body>
+</html>
